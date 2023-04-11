@@ -3,61 +3,57 @@
 """
 Created on Thu Aug 11 10:22:15 2022
 
-@author: s434626
+@author: s205272
 """
 
-
-def GC_full_reduced_separate_regress_individual(img1, img2, lag=1, alpha=.1, random_state=0):
-    """
-    Performs two separate regressions for full and reduced to compute the information. 
-    
-    """
-    from sklearn.linear_model import Ridge
-    import numpy as np 
+def GC_full_reduced_separate_regress_individual(img1, img2, lag=1, alpha=.1):
         
-    # initialise 
-    """
-    Reduced regression 
-    """
-    # reduced model 
-    clf = Ridge(alpha=alpha, random_state=random_state) # switch to Huber? 
+        from sklearn.linear_model import Ridge
+        import numpy as np 
+            
+        # initialise 
+        """
+        Reduced regression 
+        """
+        # reduced model 
+        clf = Ridge(alpha=alpha)
 
-    Y = (img1.reshape(-1,img1.shape[-1]).T)[lag:]
-    X = []
-    for ll in range(1,lag+1):
-        X_ = (img1.reshape(-1,img1.shape[-1]).T)[lag-ll:-ll]
-        X.append(X_)
-    X = np.hstack(X)
-    
-    clf.fit(X,Y)
-    
-    # logL = np.prod(np.linalg.slogdet(np.cov(Y - clf.predict(X))))
-    logL = np.log(np.var(Y - clf.predict(X), axis=0)) # .mean())
-    
-    """
-    Full Regression
-    """
-    # full model 
-    clf_full = Ridge(alpha=alpha)
-    X_full = []
-    for ll in range(1,lag+1):
-        X_ = (img1.reshape(-1,img1.shape[-1]).T)[lag-ll:-ll]
-        X_full.append(X_)
-    for ll in range(1,lag+1):
-        X_ = (img2.reshape(-1,img2.shape[-1]).T)[lag-ll:-ll]
-        X_full.append(X_)
-    X_full.append((img2.reshape(-1,img2.shape[-1]).T)[lag:])
-    X_full = np.hstack(X_full) # n_time x n_variables.
-    
-    clf_full.fit(X_full, Y)
-    
-    # logF = np.prod(np.linalg.slogdet(np.cov(Y - clf_full.predict(X_full))))
-    logF = np.log(np.var(Y - clf_full.predict(X_full), axis=0)) #.mean())
-    
-    
-    # get the difference!. # not a pval ... but a magnitude. 
-    return logF - logL 
-    
+        Y = (img1.reshape(-1,img1.shape[-1]).T)[lag:]
+        X = []
+        for ll in range(1,lag+1):
+            X_ = (img1.reshape(-1,img1.shape[-1]).T)[lag-ll:-ll]
+            X.append(X_)
+        X = np.hstack(X)
+        
+        clf.fit(X,Y)
+        
+        # logL = np.prod(np.linalg.slogdet(np.cov(Y - clf.predict(X))))
+        logL = np.log(np.var(Y - clf.predict(X), axis=0)) # .mean())
+        
+        """
+        Full Regression
+        """
+        # full model 
+        clf_full = Ridge(alpha=alpha)
+        X_full = []
+        # for ll in range(2,lag+1):
+        #     X_ = (img1.reshape(-1,img1.shape[-1]).T)[lag-ll:-ll]
+        #     X_full.append(X_)
+        for ll in range(1,lag+1):
+            X_ = (img2.reshape(-1,img2.shape[-1]).T)[lag-ll:-ll]
+            X_full.append(X_)
+        X_full.append((img2.reshape(-1,img2.shape[-1]).T)[lag:])
+        # X_full.append((img2.reshape(-1,img2.shape[-1]).T)[lag-1:-1])
+        X_full = np.hstack(X_full) # n_time x n_variables.
+        
+        clf_full.fit(X_full, Y)
+        
+        # logF = np.prod(np.linalg.slogdet(np.cov(Y - clf_full.predict(X_full))))
+        logF = np.log(np.var(Y - clf_full.predict(X_full), axis=0)) #.mean())
+        
+        
+        # get the difference!. # not a pval ... but a magnitude. 
+        return logF - logL 
     
 if __name__=="__main__":
 

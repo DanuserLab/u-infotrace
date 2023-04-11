@@ -318,7 +318,7 @@ def PDC_central_flow(img1, img2, lag=5, alpha=.1, random_state=0):
     # # X_ = Y_ - Y_.mean(axis=1)[:,None]  # do we need to take the mean?  
     Y_ = Y_.reshape(-1,Y_.shape[-1])
 
-    print(Y_.shape)
+    # print(Y_.shape)
     
     A_est, sigma = mvar_fit(Y_, p=lag)    
     sigma = np.diag(sigma)  # DTF + PDC support diagonal noise

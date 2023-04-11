@@ -3,7 +3,7 @@
 """
 Created on Thu Aug 11 10:22:15 2022
 
-@author: s434626
+@author: s205272
 """
 
     
@@ -29,6 +29,8 @@ def get_field_shape(image_size, search_area_size, overlap):
     field_shape : 2-element tuple
         the shape of the resulting flow field
     """
+    import numpy as np 
+    
     field_shape = (np.array(image_size) - np.array(search_area_size)) // (
         np.array(search_area_size) - np.array(overlap)
     ) + 1
@@ -65,7 +67,8 @@ def get_coordinates(image_size, search_area_size, overlap, center_on_field = Tru
         x to the right, positive y from top downwards, i.e.
         image coordinate system
     """
-
+    import numpy as np 
+    
     # get shape of the resulting flow field
     field_shape = get_field_shape(image_size,
                                   search_area_size,
@@ -110,6 +113,7 @@ def get_rect_coordinates(frame_a, window_size, overlap, center_on_field = False)
     '''
     Rectangular grid version of get_coordinates.
     '''
+    import numpy as np 
     if isinstance(window_size, tuple) == False and isinstance(window_size, list) == False:
         window_size = [window_size, window_size]
     if isinstance(overlap, tuple) == False and isinstance(overlap, list) == False:
@@ -176,7 +180,7 @@ def sliding_window_array_time(image, window_size = 64, overlap = 32):
     win_x = win_x[np.newaxis,:,:] + x
     win_y = win_y[np.newaxis,:,:] + y
     
-    print(win_x.shape, win_y.shape)
+    # print(win_x.shape, win_y.shape)
     windows = image[win_y, win_x]
     
     return windows
@@ -276,6 +280,8 @@ def causal_flow(vid, cause_fnc, winsize=3, **kwargs):
 
     import scipy.ndimage as ndimage 
     from tqdm import tqdm 
+    import numpy as np 
+    import skimage.transform as sktform 
     
     frame_a_ = np.pad(vid.transpose(1,2,0), [[winsize,winsize], [winsize,winsize], [0,0]], mode='constant', constant_values=0)
     
@@ -319,6 +325,7 @@ def causal_flow(vid, cause_fnc, winsize=3, **kwargs):
         mean_vector = mean_vector * intensity
         
         GC_vectors.append(-mean_vector)
+        # GC_vectors.append(mean_vector)
             
     GC_vectors = np.array(GC_vectors).reshape((xy_coords.shape))
     GC_vectors[...,0] = ndimage.gaussian_filter(GC_vectors[...,0], sigma=1.)
@@ -333,6 +340,8 @@ def causal_flow_scores(vid, cause_fnc, winsize=3, **kwargs):
 
     import scipy.ndimage as ndimage 
     from tqdm import tqdm 
+    import numpy as np 
+    import skimage.transform as sktform
     
     frame_a_ = np.pad(vid.transpose(1,2,0), [[winsize,winsize], [winsize,winsize], [0,0]], mode='constant', constant_values=0)
     
@@ -384,7 +393,7 @@ def causal_flow_scores(vid, cause_fnc, winsize=3, **kwargs):
     # GC_vectors[...,1] = ndimage.gaussian_filter(GC_vectors[...,1], sigma=1.)
     
     # GC_vectors = np.dstack([sktform.resize(GC_vectors[...,ch], output_shape=vid.shape[1:], preserve_range=True, order=1) for ch in np.arange(2)])
-    GC_scores = sktform.resize(GC_scores,  output_shape=vid.shape[1:]+(winsize,winsize), preserve_range=True, order=1)
+    GC_scores = sktform.resize(GC_scores,  output_shape=vid.shape[1:]+(winsize,winsize), preserve_range=True, order=1) # this is the problem ? 
     
     return GC_scores
 
@@ -417,6 +426,8 @@ def causal_block_flow(vid, cause_fnc, winsize=3, **kwargs):
 
     import scipy.ndimage as ndimage 
     from tqdm import tqdm 
+    import numpy as np 
+    import skimage.transform as sktform 
     
     frame_a_ = np.pad(vid.transpose(1,2,0), [[winsize,winsize], [winsize,winsize], [0,0]], mode='constant', constant_values=0)
     
@@ -475,11 +486,11 @@ def gaussian_video_pyramid(vid, scales=[1,2,4,8], sigma=1):
     
     import skimage.transform as sktform
     import numpy as np
-    from scipy.ndimage import gaussian_filter
-    
+    import scipy.ndimage as ndimage
     
     # normalise the video if not. 
     vid_ = (vid - vid.min())/(vid.max()-vid.min())
+    # vid_ = vid.copy()
     
     if sigma>0:
         vids = [ndimage.gaussian_filter(sktform.resize(vid_, output_shape=(vid_.shape[0], vid_.shape[1]//s, vid_.shape[2]//s), preserve_range=True), sigma=sigma) for s in scales]
@@ -494,11 +505,11 @@ def laplacian_video_pyramid(vid, scales=[2,4,8], sigma=1):
     
     import skimage.transform as sktform
     import numpy as np
-    from scipy.ndimage import gaussian_filter
+    import ndimage as ndimage
     
     
     # normalise the video if not. 
-    vid_ = (vid - vid.min())/(vid.max()-vid.min())
+    # vid_ = (vid - vid.min())/(vid.max()-vid.min())
     
     vids_laplace = []
     vids_blur = [vid_]

@@ -38,8 +38,8 @@ def Eval_dense_optic_flow(prev, present, params):
     # Check version of opencv installed, if not 3.0.0 then issue alert.
 #    if '3.0.0' in cv2.__version__ or '3.1.0' in cv2.__version__:
         # Make the image pixels into floats.
-    prev = prev.astype(np.float)
-    present = present.astype(np.float)
+    prev = prev.astype(np.float32) # explicit casting for compatability with newer numpy 
+    present = present.astype(np.float32)
 
     if cv2.__version__.split('.')[0] == '3' or cv2.__version__.split('.')[0] == '4':
         flow = cv2.calcOpticalFlowFarneback(prev, present, None, params['pyr_scale'], params['levels'], params['winsize'], params['iterations'], params['poly_n'], params['poly_sigma'], params['flags']) 

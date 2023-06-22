@@ -1,0 +1,7 @@
+opencv-contrib-python==4.5.*
+scikit-image
+scikit-learn
+scipy
+numpy
+matplotlib
+tqdm

@@ -7,7 +7,7 @@ def read_video_cv2(avifile):
     import numpy as np 
     
     vidcap = cv2.VideoCapture(avifile)
-    success,image = vidcap.read()
+    # success,image = vidcap.read()
     
     vid_array = []
     

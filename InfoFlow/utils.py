@@ -133,5 +133,27 @@ def read_bboxes_from_file(bboxfiles):
         
     return boxes
 
+"""
+Qiongjing (Jenny) Zou added below function, Aug 2023.
+"""
+
+def read_tiff_images(folder_path):
+
+    import skimage.io as skio
+    import numpy as np
+    import os
+    import imagecodecs # needed for skio.imread_collection
+
+    tiff_files = [file for file in os.listdir(folder_path) if file.lower().endswith('.tif') or file.lower().endswith('.tiff')]
+    
+    if len(tiff_files) == 0:
+        raise ValueError("No TIFF images found in the specified folder.")
+    
+    tiff_files.sort()  # Sort the files for sequential ordering 
+   
+    image_collection = skio.imread_collection([os.path.join(folder_path, file) for file in tiff_files])
+    image_array = np.array(image_collection)
+    
+    return image_array
 
 

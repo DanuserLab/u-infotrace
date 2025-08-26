@@ -1,9 +1,0 @@
-numpy<2
-contourpy<=1.2.0
-opencv-contrib-python==4.5.*
-scikit-image
-scikit-learn
-scipy
-matplotlib
-tqdm
-imagecodecs<2025
